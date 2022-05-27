@@ -1,93 +1,72 @@
 #include "lists.h"
 
 /**
- * looped_listint_count - Counts the number of unique nodes
- *                      in a looped listint_t linked list.
- * @head: A pointer to the head of the listint_t to check.
+ * free_listp2 - frees a linked list
+ * @head: head of a list.
  *
- * Return: If the list is not looped - 0.
- *         Otherwise - the number of unique nodes in the list.
+ * Return: no return.
  */
-size_t looped_listint_count(listint_t *head)
+void free_listp2(listp_t **head)
 {
-	listint_t *y, *x;
-	size_t nodes = 1;
+	listp_t *temp;
+	listp_t *curren;
 
-	if (head == NULL || head->next == NULL)
-		return (0);
-
-	y = head->next;
-	x = (head->next)->next;
-
-	while (x)
+	if (head != NULL)
 	{
-		if (y == x)
+		curren = *head;
+		while ((temp = curren) != NULL)
 		{
-			y = head;
-			while (y != x)
-			{
-				nodes++;
-				y = y->next;
-				x = x->next;
-			}
-
-			y = y->next;
-			while (y != x)
-			{
-				nodes++;
-				y = y->next;
-			}
-
-			return (nodes);
+			curren = curren->next;
+			free(temp);
 		}
-
-		y = y->next;
-		x = (x->next)->next;
+		*head = NULL;
 	}
-
-	return (0);
 }
 
 /**
- * free_listint_safe - Frees a listint_t list safely (ie.
- *                     can free lists containing loops)
- * @h: A pointer to the address of
- *     the head of the listint_t list.
+ * free_listint_safe - frees a linked list.
+ * @h: head of a list.
  *
- * Return: The size of the list that was freed.
- *
- * Description: The function sets the head to NULL.
+ * Return: size of the list that was freed.
  */
 size_t free_listint_safe(listint_t **h)
 {
-	listint_t *tmp;
-	size_t nodes, index;
+	size_t amount_of_nodes = 0;
+	listp_t *headptr, *new, *add;
+	listint_t *curren;
 
-	nodes = looped_listint_count(*h);
-
-	if (nodes == 0)
+	headptr = NULL;
+	while (*h != NULL)
 	{
-		for (; h != NULL && *h != NULL; nodes++)
+		new = malloc(sizeof(listp_t));
+
+		if (new == NULL)
+			exit(98);
+
+		new->p = (void *)*h;
+		new->next = headptr;
+		headptr = new;
+
+		add = headptr;
+
+		while (add->next != NULL)
 		{
-			tmp = (*h)->next;
-			free(*h);
-			*h = tmp;
+			add = add->next;
+			if (*h == add->p)
+			{
+				*h = NULL;
+				free_listp2(&headptr);
+				return (amount_of_nodes);
+			}
 		}
+
+		curren = *h;
+		*h = (*h)->next;
+		free(curren);
+		amount_of_nodes++;
 	}
 
-	else
-	{
-		for (index = 0; index < nodes; index++)
-		{
-			tmp = (*h)->next;
-			free(*h);
-			*h = tmp;
-		}
-
-		*h = NULL;
-	}
-
-	h = NULL;
-
-	return (nodes);
+	*h = NULL;
+	free_listp2(&headptr);
+	return (amount_of_nodes);
 }
