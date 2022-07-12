@@ -1,6 +1,6 @@
 #include "main.h"
 /*
- * Author: Agbiaowei Michael Ifiekemi
+ * Author: Adelaja Oluwatosin Cecilia
  */
 
 /**
